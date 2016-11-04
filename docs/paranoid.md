@@ -22,11 +22,20 @@ If you want to select the cyphers used by OpenVPN the following parameters of th
 
 The following options have been tested successfully:
 
-    docker run --volumes-from $OVPN_DATA --net=none --rm kylemanna/openvpn ovpn_genconfig -C 'AES-256-CBC' -a 'SHA384'
+    docker run -v $OVPN_DATA:/etc/openvpn --net=none --rm kylemanna/openvpn ovpn_genconfig -C 'AES-256-CBC' -a 'SHA384'
 
 Changing the `tls-cipher` option seems to be more complicated because some clients (namely NetworkManager in Debian Jessie) seem to have trouble with this. Running `openvpn` manually also did not solve the issue:
 
     TLS Error: TLS key negotiation failed to occur within 60 seconds (check your network connectivity)
     TLS Error: TLS handshake failed
+
+## EasyRSA and 4096 bit RSA Keys
+
+EasyRSA will generate 4096 bit RSA keys when the `-e EASYRSA_KEY_SIZE=4096` argument is added to `ovpn_initpki` and `easyrsa build-client-full` commands.
+
+    docker run -e EASYRSA_KEY_SIZE=4096 -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki
+    docker run -e EASYRSA_KEY_SIZE=4096 -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full CLIENTNAME nopass
+
+## Additional Resources
 
 Have a look at the [Applied-Crypto-Hardening](https://github.com/BetterCrypto/Applied-Crypto-Hardening/tree/master/src/configuration/VPNs/OpenVPN) project for more examples.

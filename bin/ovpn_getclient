@@ -35,6 +35,7 @@ get_client_config() {
 client
 nobind
 dev $OVPN_DEVICE
+key-direction 1
 remote-cert-tls server
 
 remote $OVPN_CN $OVPN_PORT $OVPN_PROTO
@@ -83,6 +84,11 @@ $OVPN_ADDITIONAL_CLIENT_CONFIG
 
     if [ -n "$OVPN_AUTH" ]; then
         echo "auth $OVPN_AUTH"
+    fi
+
+    if [ -n "$OVPN_OTP_AUTH" ]; then
+        echo "auth-user-pass"
+        echo "auth-nocache"
     fi
 
     if [ -n "$OVPN_COMP_LZO" ]; then
