@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: "openvpn"
-    image: 'kylemanna/openvpn'
+    image: 'taylorsmcclure/docker-openvpn'
     securityContext:
           capabilities:
             add:
