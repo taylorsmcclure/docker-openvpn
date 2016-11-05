@@ -3,12 +3,12 @@
 #
 # Run the OpenVPN server normally
 #
-if [ -n "$KUBERNETES" ]; then
-  source getsecrets
-fi
-
 if [ "$DEBUG" == "1" ]; then
   set -x
+fi
+
+if [ -n "$KUBERNETES" ]; then
+  source getsecrets
 fi
 
 set -e
