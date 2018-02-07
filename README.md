@@ -16,18 +16,20 @@ a corresponding [Digital Ocean Community Tutorial](http://bit.ly/1AGUZkq).
 * Docker Registry @ [kylemanna/openvpn](https://hub.docker.com/r/kylemanna/openvpn/)
 * GitHub @ [kylemanna/docker-openvpn](https://github.com/kylemanna/docker-openvpn)
 
-#### Example Service
-
-* [backroad.io](http://beta.backroad.io?utm_source=kylemanna/openvpn&utm_medium=readme&utm_campaign=20150621) - powered by *kylemanna/openvpn*
-
 ## Quick Start
 
-* Pick a name for the `$OVPN_DATA` data volume container, it will be created automatically.
+* Pick a name for the `$OVPN_DATA` data volume container. It's recommended to
+  use the `ovpn-data-` prefix to operate seamlessly with the reference systemd
+  service.  Users are encourage to replace `example` with a descriptive name of
+  their choosing.
 
-        OVPN_DATA="ovpn-data"
+        OVPN_DATA="ovpn-data-example"
 
-* Initialize the `$OVPN_DATA` container that will hold the configuration files and certificates
+* Initialize the `$OVPN_DATA` container that will hold the configuration files
+  and certificates.  The container will prompt for a passphrase to protect the
+  private key used by the newly generated certificate authority.
 
+        docker volume create --name $OVPN_DATA
         docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_genconfig -u udp://VPN.SERVERNAME.COM
         docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki
 
@@ -43,13 +45,32 @@ a corresponding [Digital Ocean Community Tutorial](http://bit.ly/1AGUZkq).
 
         docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
 
+## Next Steps
+
+### More Reading
+
+Miscellaneous write-ups for advanced configurations are available in the
+[docs](docs) folder.
+
+### Systemd Init Scripts
+
+A `systemd` init script is available to manage the OpenVPN container.  It will
+start the container on system boot, restart the container if it exits
+unexpectedly, and pull updates from Docker Hub to keep itself up to date.
+
+Please refer to the [systemd documentation](docs/systemd.md) to learn more.
+
+### Docker Compose
+
+If you prefer to use `docker-compose` please refer to the [documentation](docs/docker-compose.md).
+
 ## Debugging Tips
 
 * Create an environment variable with the name DEBUG and value of 1 to enable debug output (using "docker -e").
 
         docker run -v $OVPN_DATA:/etc/openvpn -p 1194:1194/udp --privileged -e DEBUG=1 kylemanna/openvpn
 
-* Test using a client that has openvpn installed correctly 
+* Test using a client that has openvpn installed correctly
 
         $ openvpn --config CLIENTNAME.ovpn
 
@@ -58,6 +79,10 @@ a corresponding [Digital Ocean Community Tutorial](http://bit.ly/1AGUZkq).
         $ ping 8.8.8.8    # checks connectivity without touching name resolution
         $ dig google.com  # won't use the search directives in resolv.conf
         $ nslookup google.com # will use search
+
+* Consider setting up a [systemd service](/docs/systemd.md) for automatic
+  start-up at boot time and restart in the event the OpenVPN daemon or Docker
+  crashes.
 
 ## How Does It Work?
 
@@ -169,7 +194,7 @@ of a guarantee in the future.
   volume for re-use across containers
 * Addition of tls-auth for HMAC security
 
-## Tested On
+## Originally Tested On
 
 * Docker hosts:
   * server a [Digital Ocean](https://www.digitalocean.com/?refcode=d19f7fe88c94) Droplet with 512 MB RAM running Ubuntu 14.04
@@ -178,8 +203,3 @@ of a guarantee in the future.
      * OpenVPN core 3.0 android armv7a thumb2 32-bit
   * OS X Mavericks with Tunnelblick 3.4beta26 (build 3828) using openvpn-2.3.4
   * ArchLinux OpenVPN pkg 2.3.4-1
-  * 
-
-## Having permissions issues with Selinux enabled?
-
-See [this](docs/selinux.md)
